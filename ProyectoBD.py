@@ -1,6 +1,8 @@
-from multiprocessing import connection
+from cProfile import run
+from mailbox import NoSuchMailboxError
 import mysql.connector
 
+#Clases a usar
 class DataBase:
 
     #Conectar a la BD
@@ -15,71 +17,57 @@ class DataBase:
         self.cursor = self.connection.cursor()
         print("Conexion exitosa\n")
 
-    #Seleccionar una carrera
-    def seleccionarCarrera(self, nombre):
-        comando = """SELECT * from Carrera Where nombreCarrera = %s"""
-        try:
-            self.cursor.execute(comando, (nombre,))
-            carrera = self.cursor.fetchone()
-
-            print("Nombre:", carrera[0])
-            print("Cantidad de alumnos:", carrera[1])
-        except Exception as e:
-            print("Hubo un error al leer la informacion")
-
-    #Seleccionar todas las carreras
-    def seleccionarTodasLasCarreras(self):
-        comando = 'SELECT * FROM Carrera'
-        
-        try:
-            self.cursor.execute(comando)
-            carreras = self.cursor.fetchall()
-
-            for carrera in carreras:
-                print("Nombre de la carrera:", carrera[0], " / Cantidad de alumnos: ", carrera[1])
-                
-        except Exception as e:
-            print("Hubo un error al leer la informacion")
-
-    def agregarCarrera(self, nombre):
-        comando="""INSERT INTO Carrera (nombreCarrera, cantidadAlumnos) VALUES (%s, %s) """
-        try:
-            self.cursor.execute(comando, (nombre, 0))
-            self.connection.commit()
-            print("Se agrego correctamente la carrera ", nombre, "\n")
-        except Exception as e:
-            print("Hubo algun problema al agregar la carrera")
-
     #Finalizar la conexion a la BD
     def terminarConexion(self):
+        print("\nFinalizando conexion!")
         self.cursor.close()
         self.connection.close()
+        print("Se finalizo correctamente la conexion")
 
+    #Agregar una carrera a la BD
+    def agregarCarrera(self, nombreCarrera):
+        comando="INSERT INTO Carrera (nombreCarrera) VALUES (%s)"
+        try:
+            self.cursor.execute(comando, (nombreCarrera,))
+            self.connection.commit()
+            print("Se agrego correctamente la carrera ",nombreCarrera, "\n")
+        except Exception as e:
+            print(e)
 
-database = DataBase()
+    #Agregar un alumno a la BD
+    def agregarAlumno(self, nombre, apellido, runA, añoIngreso, nombreCarrera):
+        comando="INSERT INTO Alumno (nombreA, apellidoA, runA, correoA, añoIngreso, Carrera_nombreCarrera) VALUES (%s,%s,%s,%s,%s,%s)"
+        try:
+            self.cursor.execute(comando, (nombre, apellido, runA, ((nombre+"."+apellido+"@mail.andes.cl").lower()), añoIngreso, nombreCarrera))
+            self.connection.commit()
+            print("Se agrego correctamente al alumno ", nombre, " ", apellido)
+        except Exception as e:
+            print(e)
+
+# ===============================================================
+#Codigo principal
+
+db = DataBase()
 
 while(True):
-    print("1) Mostrar una carrera")
-    print("2) Mostrar todas las carreras")
-    print("3) Agregar carrera")
-    print("0) Salir del programa\n")
-
-    opcion = int(input())
+    print("1) Agregar una carrera")
+    print("2) Agregar un alumno")
+    print("0) Salir del programa")
+    opcion = int(input("Ingrese una de las opciones: "))
     
     if opcion == 1:
-        print("Ingresar el nombre de la carrera: ")
-        database.seleccionarCarrera(input())
+        db.agregarCarrera(input("Ingrese el nombre de la carrera: "))
     elif opcion == 2:
-        database.seleccionarTodasLasCarreras()
-    elif opcion == 3:
-        print("Ingresar el nombre de la carrera")
-
-        database.agregarCarrera(input())
+        nombre = input("Ingrese el nombre del alumno:")
+        apellido = input("Ingrese el apellido del alumno:")
+        runA = int(input("Ingrese el RUN del alumno:"))
+        añoIngreso = int(input("Ingrese el año de ingreso a la carrera del alumno:"))
+        nombreCarrera = input("Ingrese la carrera elegida por el alumno:")
+        db.agregarAlumno(nombre, apellido, runA, añoIngreso, nombreCarrera)
     elif opcion == 0:
         break
     else:
-        print("Ha ingresado una opcion que no se encuentra en el menu")
+        print("No existe tal opcion\n")
 
-print("Finalizando conexion!")
-database.terminarConexion()
     
+db.terminarConexion()
