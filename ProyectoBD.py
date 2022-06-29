@@ -1,4 +1,4 @@
-import DataBase
+from DataBase import *
 
 db = DataBase()
 
@@ -8,6 +8,7 @@ while(True):
     print("3) Agregar malla curricular")
     print("4) Agregar asignaturas a una malla")
     print("5) Agregar un profesor")
+    print("6) Agregar ramos a un alumno")
     print("0) Salir del programa")
     opcion = int(input("Ingrese una de las opciones: "))
     
@@ -20,6 +21,7 @@ while(True):
         añoIngreso = int(input("Ingrese el año de ingreso a la carrera del alumno: "))
         nombreCarrera = input("Ingrese la carrera elegida por el alumno: ")
         db.agregarAlumno(nombre, apellido, runA, añoIngreso, nombreCarrera)
+        db.actualizarAlumnos(nombreCarrera)
     elif opcion == 3:
         nombreCarrera=input("Ingrese el nombre de la carrera: ")
         año=int(input("Ingrese el año: "))
@@ -48,9 +50,25 @@ while(True):
         nombreP=input("Ingrese el nombre del profesor: ")
         apellidoP=input("Ingrese el apellido del profesor: ")
         runP=int(input("Ingrese el RUN del profesor: "))
-        
+        db.agregarProfesor(nombreP, apellidoP, runP)
+    elif opcion == 6:
+        nombreCarrera=input("Ingrese el nombre de la carrera: ")
+        año=int(input("Ingrese el año: "))
+        run=int(input("Ingrese el RUN del alumno: "))
+        idM = int(db.seleccionarMallaCurricular(año, nombreCarrera))
 
-
+        if idM != 0:
+            print("Se encontro la malla curricular ", idM)
+            semestreA=int(input("Eliga el semestre de las asignaturas a agregar: "))
+            listaA=db.seleccionarAsignaturas(idM, semestreA)
+            for asignatura in listaA:
+                print("Asignatura = ", asignatura[0])
+                semestre=int(input("Ingrese el semestre en que se cursa : "))
+                año=int(input("Ingrese el año en el que se cursa: "))
+                db.agregarRamo(asignatura[0],año,semestre)
+                db.agregarRamoAlumno(asignatura[0], run)    
+        else:
+            print("No se encontro la malla curricular\nNo se puede continuar con la transaccion")
     elif opcion == 0:
         break
     else:
