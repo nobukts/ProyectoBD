@@ -3,6 +3,9 @@ from DataBase import *
 db = DataBase()
 
 while(True):
+    print('\033[34m')
+    print("PROYECTO BD")
+    print("============\n")
     print("1) Agregar una carrera")
     print("2) Agregar un alumno")
     print("3) Agregar malla curricular")
@@ -10,6 +13,7 @@ while(True):
     print("5) Agregar un profesor")
     print("6) Agregar ramos a un alumno")
     print("0) Salir del programa")
+    print('\033[0m')
     opcion = int(input("Ingrese una de las opciones: "))
     
     if opcion == 1:
@@ -21,7 +25,7 @@ while(True):
         añoIngreso = int(input("Ingrese el año de ingreso a la carrera del alumno: "))
         nombreCarrera = input("Ingrese la carrera elegida por el alumno: ")
         db.agregarAlumno(nombre, apellido, runA, añoIngreso, nombreCarrera)
-        db.actualizarAlumnos(nombreCarrera)
+        db.actualizarCantAlumnos(nombreCarrera)
     elif opcion == 3:
         nombreCarrera=input("Ingrese el nombre de la carrera: ")
         año=int(input("Ingrese el año: "))
@@ -45,7 +49,7 @@ while(True):
                 runP=int(input("Ingrese el RUN del profesor a cargo de la asignatura: "))
                 db.agregarAsignatura(nombreAsig,codigoAsig,cantCreditos,semestre,prerequisito,notaAprobacion, idM,runP)
         else:
-            print("No se encontro la malla curricular\nNo se puede continuar con la transaccion")
+            print('\033[31m' + "No se encontro la malla curricular\nNo se puede continuar con la transaccion" + '\033[0m')
     elif opcion == 5:
         nombreP=input("Ingrese el nombre del profesor: ")
         apellidoP=input("Ingrese el apellido del profesor: ")
@@ -68,7 +72,7 @@ while(True):
                 db.agregarRamo(asignatura[0],año,semestre)
                 db.agregarRamoAlumno(asignatura[0], run)    
         else:
-            print("No se encontro la malla curricular\nNo se puede continuar con la transaccion")
+            print('\033[31m' + "No se encontro la malla curricular\nNo se puede continuar con la transaccion" + '\033[0m')
     elif opcion == 0:
         break
     else:
